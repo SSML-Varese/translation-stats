@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	//"regexp"
 	"os"
 	"strings"
 )
@@ -22,7 +21,7 @@ func main() {
 
 	authors, _ = parseFiles(files)
 
-	authors_count := countDuplicates(authors)
+	authors_count := summarise(authors)
 
 	for k, v := range authors_count {
 		fmt.Printf("Item : %s , Count : %d\n", k, v)
@@ -30,9 +29,7 @@ func main() {
 }
 
 func parseFiles(files []os.FileInfo) (authors []string, editors []string) {
-	//var editors []string
-	//var authors []string
-
+	// Iterate through each filename, making sure that the name matches
 	for _, file := range files {
 		parts := strings.Split(file.Name(), ".")
 		ext := parts[1]
@@ -57,7 +54,7 @@ func parseFiles(files []os.FileInfo) (authors []string, editors []string) {
 		fmt.Println("Editor:", editor)
 
 		//author_names := regexp.MustCompile("[, &]+").Split(author, -1)
-		author_names := strings.FieldsFunc(author, Split)
+		author_names := strings.FieldsFunc(author, SplitNames)
 
 		fmt.Println("Authors:", author_names)
 		fmt.Println("There are", len(author_names), "authors")
@@ -72,27 +69,39 @@ func parseFiles(files []os.FileInfo) (authors []string, editors []string) {
 		fmt.Println(file.Name())
 	}
 
-	return //authors, editors
+	return
 }
 
-func countDuplicates(list []string) map[string]int {
+func summarise(list []string) map[string]int {
 
-	duplicate_frequency := make(map[string]int)
+	item_frequency := make(map[string]int)
 
 	for _, item := range list {
-		// check if the item/element exists in the duplicate_frequency map
+		// check if the item/element exists in the item_frequency map
 
-		_, exist := duplicate_frequency[item]
+		_, exist := item_frequency[item]
 
 		if exist {
-			duplicate_frequency[item] += 1 // increase counter by 1 if already in the map
+			item_frequency[item] += 1 // increase counter by 1 if already in the map
 		} else {
-			duplicate_frequency[item] = 1 // else start counting from 1
+			item_frequency[item] = 1 // else start counting from 1
 		}
 	}
-	return duplicate_frequency
+	return item_frequency
 }
 
-func Split(r rune) bool {
+func SplitNames(r rune) bool {
+	// If the same translator translates two documents on their own on the same date,
+	// the filenames will contain the author's name followed by a number,
+	// which must be stripped away:
+	//   Author 1
+	//   Author 2
+	//
+	// Depending on how many translators there are, the names will be listed in
+	// slightly different ways. If there are two authors, they will appear as:
+	//   Author & Author
+	//
+	// If there are 3 or more authors, they will appear as:
+	//   Author, Author & Author
 	return r == ' ' || r == '&' || r == ',' || r == '1' || r == '2'
 }
