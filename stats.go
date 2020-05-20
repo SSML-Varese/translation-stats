@@ -31,11 +31,11 @@ func main() {
 func parseFiles(files []os.FileInfo) (authors []string, editors []string) {
 	// Iterate through each filename, making sure that the name matches
 	for _, file := range files {
-		parts := strings.Split(file.Name(), ".")
-		ext := parts[1]
-		filename := parts[0]
+		fmt.Println(file.Name())
 
-		fmt.Println(filename, ext)
+		parts := strings.Split(file.Name(), ".")
+
+		filename := parts[0]
 
 		info_parts := strings.Split(filename, " - ")
 
