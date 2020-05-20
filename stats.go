@@ -53,8 +53,7 @@ func parseFiles(files []os.FileInfo) (authors []string, editors []string) {
 		fmt.Println("Author:", author)
 		fmt.Println("Editor:", editor)
 
-		//author_names := regexp.MustCompile("[, &]+").Split(author, -1)
-		author_names := strings.FieldsFunc(author, SplitNames)
+		author_names := ExtractNames(author)
 
 		fmt.Println("Authors:", author_names)
 		fmt.Println("There are", len(author_names), "authors")
@@ -103,5 +102,17 @@ func SplitNames(r rune) bool {
 	//
 	// If there are 3 or more authors, they will appear as:
 	//   Author, Author & Author
-	return r == ' ' || r == '&' || r == ',' || r == '1' || r == '2'
+	return r == '&' || r == ',' || r == '1' || r == '2'
 }
+
+func ExtractNames(names string) []string {
+	//author_names := regexp.MustCompile("[, &]+").Split(author, -1)
+	author_names := strings.FieldsFunc(names, SplitNames)
+
+	for index, element := range author_names {
+		author_names[index] = strings.TrimSpace(element)
+	}
+
+	return author_names
+}
+
